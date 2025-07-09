@@ -1,0 +1,130 @@
+###########
+# Demo Financial news
+###########
+
+# If it's not running, start it and retest
+POST /_ml/trained_models/.multilingual-e5-small_linux-x86_64/_infer
+{
+  "docs": {
+    "text_field": "Trying out Elasticsearch, so far so good?"
+  }
+}
+# Create a dedicated inference endpoint
+PUT _inference/text_embedding/e5-inference-endpoint
+{
+  "service": "elasticsearch",
+  "service_settings": {
+    "num_allocations": 1,
+    "num_threads": 1,
+    "model_id": ".multilingual-e5-small_linux-x86_64"
+  }
+}
+POST _inference/text_embedding/e5-inference-endpoint
+{
+  "input": "Trying out Elasticsearch, so far so good?"
+}
+# create the index with semantic
+DELETE financial-news-semantic
+PUT financial-news-semantic
+{
+    "mappings": {
+      "properties": {
+        "@timestamp": {
+          "type": "date"
+        },
+        "@version": {
+          "type": "keyword"
+        },
+        "Feed": {
+          "type": "keyword"
+        },
+        "author": {
+          "type": "keyword"
+        },
+        "link": {
+          "type": "keyword"
+        },
+        "message": {
+          "type": "text",
+          "analyzer": "french",
+          "copy_to": "message_semantic"
+        },
+        "message_semantic": {
+          "type": "semantic_text",
+          "inference_id": "e5-inference-endpoint"
+        },
+        "published": {
+          "type": "date"
+        },
+        "tags": {
+          "type": "text",
+          "fields": {
+            "keyword": {
+              "type": "keyword",
+              "ignore_above": 256
+            }
+          }
+        },
+        "title": {
+          "type": "text",
+          "analyzer": "french",
+          "copy_to": "title_semantic"
+        },
+        "title_semantic": {
+          "type": "semantic_text",
+          "inference_id": "e5-inference-endpoint"
+        }
+      }
+    }
+  }
+# Look inside
+GET financial-news-semantic/_search
+GET financial-news-semantic/_mapping
+# great will also find the doc in semantic search!
+GET financial-news-semantic/_search
+{
+  "query": {
+    "match": {
+      "link": "https://www.valeursactuelles.com/societe/une-cryptomonnaie-en-reference-a-hitler-atteint-une-capitalisation-de-22-millions-de-dollars"
+    }
+  }
+}
+GET financial-news-semantic/_search
+{
+  "query": {
+    "semantic": {
+      "field": "message_semantic",
+      "query": "Des nouvelles sur les sociétés technologiques ?"
+    }
+  }
+}
+GET financial-news-semantic/_search
+{
+  "size": 10,
+  "retriever": {
+    "rrf": {
+      "retrievers": [
+        {
+          "standard": {
+            "query": {
+              "semantic": {
+                "field": "title_semantic",
+                "query": "Des nouvelles sur les sociétés technologiques ?"
+              }
+            }
+          }
+        },
+        {
+          "standard": {
+            "query": {
+              "semantic": {
+                "field": "message_semantic",
+                "query": "Des nouvelles sur les sociétés technologiques ?"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}
