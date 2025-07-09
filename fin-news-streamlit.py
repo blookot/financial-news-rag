@@ -1,7 +1,7 @@
 import os
-import streamlit as st
-from openai import AzureOpenAI
-from elasticsearch import Elasticsearch
+import streamlit as st # type: ignore
+from openai import AzureOpenAI # type: ignore
+from elasticsearch import Elasticsearch # type: ignore
 
 client = AzureOpenAI(
     azure_endpoint=os.environ['AZURE_OPENAI_ENDPOINT'],
