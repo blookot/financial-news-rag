@@ -130,6 +130,16 @@ Open your browser to the provided address (usually `http://localhost:8501`) to s
 
 -----
 
+## Final thoughts
+
+You will note that this project was made by a french guy! The feeds are in French, the index mapping specifies a french analyzer for text fields and the choice of e5 (rather than ELSER that performs very well) is for multilingual support!<br/>
+However, you can adapt the code for ELSER and delete the french analyzer in the mapping.
+
+If you want to add/change the RSS feeds listed in the logstash config file, you might want to check RSS 2.0 compliance of the feed at: https://validator.w3.org/feed/<br/>
+And of course, check the Logstash logs to see if the RSS feed is properly read.
+
+-----
+
 ## Authors
 
 * **Vincent Maury** - *Initial commit* - [blookot](https://github.com/blookot)

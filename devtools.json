@@ -2,11 +2,11 @@
 # Demo Financial news
 ###########
 
-# If it's not running, start it and retest
+# If e5 is not running (or even not downloaded), start it and retest
 POST /_ml/trained_models/.multilingual-e5-small_linux-x86_64/_infer
 {
   "docs": {
-    "text_field": "Trying out Elasticsearch, so far so good?"
+    "text_field": "Trying out e5 ML, so far so good?"
   }
 }
 # Create a dedicated inference endpoint
@@ -21,9 +21,10 @@ PUT _inference/text_embedding/e5-inference-endpoint
 }
 POST _inference/text_embedding/e5-inference-endpoint
 {
-  "input": "Trying out Elasticsearch, so far so good?"
+  "input": "Trying out e5 ML, so far so good?"
 }
-# create the index with semantic
+
+# Create the index with semantic fields
 DELETE financial-news-semantic
 PUT financial-news-semantic
 {
@@ -77,18 +78,20 @@ PUT financial-news-semantic
       }
     }
   }
-# Look inside
-GET financial-news-semantic/_search
-GET financial-news-semantic/_mapping
-# great will also find the doc in semantic search!
+
+# Look how many documents we have
+GET financial-news-semantic/_search?size=0
+
+# Now let's try a first basic lexical search
 GET financial-news-semantic/_search
 {
   "query": {
     "match": {
-      "link": "https://www.valeursactuelles.com/societe/une-cryptomonnaie-en-reference-a-hitler-atteint-une-capitalisation-de-22-millions-de-dollars"
+      "title": "Apple"
     }
   }
 }
+# Now a semantic (vector) search
 GET financial-news-semantic/_search
 {
   "query": {
@@ -98,33 +101,47 @@ GET financial-news-semantic/_search
     }
   }
 }
+# Simple hybrid search
 GET financial-news-semantic/_search
 {
   "size": 10,
   "retriever": {
-    "rrf": {
+      "rrf": {
       "retrievers": [
-        {
+          {
           "standard": {
-            "query": {
+              "query": {
               "semantic": {
-                "field": "title_semantic",
-                "query": "Des nouvelles sur les sociétés technologiques ?"
+                  "field": "message_semantic",
+                  "query": "Des nouvelles sur les sociétés technologiques ?"
               }
-            }
+              }
           }
-        },
-        {
+          },
+          {
           "standard": {
-            "query": {
+              "query": {
               "semantic": {
-                "field": "message_semantic",
-                "query": "Des nouvelles sur les sociétés technologiques ?"
+                  "field": "title_semantic",
+                  "query": "Rien ne va plus !"
               }
-            }
+              }
           }
-        }
+          },
+          {
+          "standard": {
+              "query": {
+              "multi_match": {
+                  "query": "Apple",
+                  "fields": [
+                  "message",
+                  "title"
+                  ]
+              }
+              }
+          }
+          }
       ]
-    }
+      }
   }
 }
