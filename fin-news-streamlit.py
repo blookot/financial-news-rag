@@ -125,8 +125,8 @@ st.title("Actualités financières")
 
 # Main chat form
 with st.form("chat_form"):
-    query = st.text_input("You: ")
-    submit_button = st.form_submit_button("Send")
+    query = st.text_input("Question : ")
+    submit_button = st.form_submit_button("Envoyer")
 
 # Generate and display response on form submission
 negResponse = "Désolé, je ne suis pas capable de vous répondre avec les informations que j'ai."
@@ -134,4 +134,4 @@ if submit_button:
     prompt = search(query)
     answer = chat_with_llm(prompt, query)
     
-    st.write(f"Réponse: {answer.strip()}")
+    st.write(f"Réponse : {answer.strip()}")
