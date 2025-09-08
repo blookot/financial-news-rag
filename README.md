@@ -1,5 +1,5 @@
 # Chatbot on financial news
-Demo of a chatbot querying financial news RSS feeds using Elastic RAG and LLM
+Demo of a chatbot querying financial news RSS feeds using Elastic RAG and LLM.
 
 This project is a financial news analysis application that uses a RAG (Retrieval-Augmented Generation) architecture. It periodically fetches articles from RSS feeds, indexes them in Elasticsearch using semantic embeddings, and leverages a Large Language Model (LLM) to synthesize information and answer user queries through a Streamlit interface.
 
@@ -59,6 +59,7 @@ The first step is to configure your Elasticsearch cluster to store and search th
       * Copy the contents of the `devtools.json` file and execute each command step-by-step. This script will:
           * Create an inference endpoint (`e5-inference-endpoint`) for the e5 ML model.
           * Create the `financial-news-semantic` index with the correct mapping for semantic search.
+          * Provide a few testing queries to run once data are loaded.
 
 ### 2\. Data Ingestion with Logstash
 
@@ -123,7 +124,7 @@ The final step is to configure and launch the web interface.
 Once all configurations are complete, you can launch the Streamlit application:
 
 ```bash
-streamlit run fin-news-streamlit.py
+streamlit run fin-news-streamlit_2col.py
 ```
 
 Open your browser to the provided address (usually `http://localhost:8501`) to start querying financial news.
